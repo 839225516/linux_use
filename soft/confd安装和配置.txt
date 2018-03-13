@@ -1,0 +1,52 @@
+
+github:
+https://github.com/839225516/confd-1.git
+
+二进制安装
+# wget https://github.com/kelseyhightower/confd/releases/download/v0.15.0/confd-0.15.0-linux-amd64
+
+# mv confd /usr/bin/
+# mkdir -p /etc/confd/{conf.d,templates}
+
+
+con.d目录存放配置文件 *.toml，可以有多个toml配置文件
+# vim /etc/confd/conf.d/myconfig.toml
+
+[template]
+prefix = "/yourapp"
+src = "nginx.tmpl"
+dest = "/tmp/yourapp.conf"
+owner = "nginx"
+mode = "0644"
+keys = [
+	"/subdomain",
+	"/upstream",
+]
+check_cmd = "/usr/sbin/nginx -t -c {{.src}}"
+reload_cmd = "/usr/sbin/service nginx reload"
+
+
+
+src 指配置文件的模板
+dest 指生产的配置文件
+keys 指要用到的 kes值
+check_cmd： 会在替换之前执行，检测替换的配置文件是否正确，正确再执行替换
+reload_cmd: 替换配置文件后，服务reload配置文件
+
+templates目录是存放配置文件的模板,这里取前面的keys的值
+
+{{getv "/subdomain"}}
+
+
+执行命令 
+
+只一次 
+etcd  	# confd -onetime -backend etcd -node http://127.0.0.1:2379 
+zookeeper 	# confd -onetime -backend zookeeper -node 172.20.7.102:2181
+
+
+后台定时60s检测一次
+etcd 	# confd -interval=60 -backend etcd -node http://127.0.0.1:2379 &
+zookeeper 	# confd -interval=60 -backend zookeeper -node 172.20.7.102:2181 &
+
+
