@@ -1,4 +1,6 @@
 #! /usr/bin/env bash
+# 适用于只有后台启动的服务
+
 set -eu
 
 # pid文件
