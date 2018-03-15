@@ -208,7 +208,19 @@ etcd 数据迁移：
 
 
 
+对于 api 3 备份与恢复
+在使用 API 3 时需要使用环境变量 ETCDCTL_API 明确指定
+# export ETCDCTL_API=3
+# etcdctl --endpoints localhost:2379 snapshot save snapshot.db
 
+恢复
+# etcdctl snapshot restore snapshot.db --name m3 --data-dir=/home/etcd_data
 
+恢复后的文件需要修改权限为 etcd:etcd
+--name:重新指定一个数据目录，可以不指定，默认为 default.etcd
+--data-dir：指定数据目录
+建议使用时不指定 name 但指定 data-dir，并将 data-dir 对应于 etcd 服务中配置的 data-dir
+
+etcd 集群都是至少 3 台机器，官方也说明了集群容错为 (N-1)/2，所以备份数据一般都是用不到
 
 
