@@ -1,0 +1,214 @@
+centos6 安装etc集群
+
+etcd 做为一个分布式键值对存储，通过分布式锁，leader选举和写屏障(write barriers)来实现可靠的分布式协作
+
+准备工作：
+
+版本信息：
+    os: CentOS release 6.5 (Final)
+    etcd: etcd-v3.3.2-linux-amd64.tar.gz
+
+机器配置：
+    etcd_1  10.0.34.15
+    etcd_1  10.0.34.16
+    etcd_1  10.0.34.17
+
+搭建etcd集群
+1）下载二进制包
+# wget https://github.com/coreos/etcd/releases/download/v3.3.2/etcd-v3.3.2-linux-amd64.tar.gz
+
+# tar zxf etcd-v3.3.2-linux-amd64.tar.gz
+# cd etcd-v3.3.2-linux-amd64 
+# cp etcd /usr/local/bin && cp etcdctl /usr/local/bin
+
+2) 启动脚本 /etc/init.d/etcd
+
+参数说明：
+--name      指定节点名，每个节点名唯一
+--data-dir  指定节点的数据存储目录
+--initial-advertise-peer-urls  用于节点之间通信的url，节点间将以该值进行通信
+--listen-peer-urls    监听URL，集群内部将通过这些url进行数据交互(如选举，数据同步等)
+--listen-client-urls  监听的用于客户端通信的url
+--advertise-client-urls  建议使用的客户端通信url,该值用于etcd代理或etcd成员与etcd节点通信
+--initial-cluster-token  集群token
+--initial-cluster        集群中所有的initial-advertise-peer-urls 的合集
+--initial-cluster-state new  新建集群的标志
+
+# vim /etc/init.d/etcd
+
+# ----------------------------------------
+#  10.0.34.17
+#!/bin/bash
+
+# /etc/init.d/etcd
+#
+# Startup script for etcd
+#
+# chkconfig: 2345 20 80
+# description: Starts and stops etcd
+
+# Source function library.
+. /etc/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+
+prog="etcd"
+prog_bin="/usr/local/bin/$prog"
+desc="etcd  service discovery daemon"
+
+ETCD_USER="root"
+ETCD_OPTS="--name etcd_conf3 \
+--data-dir=/data/etcd_data/etcd_conf \
+--initial-advertise-peer-urls http://10.0.34.17:2380 \
+--listen-peer-urls http://10.0.34.17:2380 \
+--listen-client-urls http://10.0.34.17:2379,http://127.0.0.1:2379 \
+--advertise-client-urls http://10.0.34.17:2379 \
+--initial-cluster-token etcd-cluster-conf \
+--initial-cluster etcd_conf1=http://10.0.34.15:2380,etcd_conf2=http://10.0.34.16:2380,etcd_conf3=http://10.0.34.17:2380 \
+--initial-cluster-state new"
+ETCD_OUT_FILE="/var/log/etcd.log"
+
+
+if ! [ -f $prog_bin ]; then
+  echo "$prog binary not found."
+  exit 5
+fi
+
+#if [ -f /etc/sysconfig/$prog ]; then
+#  . /etc/sysconfig/$prog
+#else
+#  echo "No sysconfig file found in /etc/sysconfig/$prog... exiting."
+#  exit 5
+#fi
+
+start() {
+  echo "Starting $desc ($prog): "
+  su $ETCD_USER -c "nohup $prog_bin $ETCD_OPTS >> $ETCD_OUT_FILE 2>&1 &"
+  RETVAL=$?
+  return $RETVAL
+}
+
+stop() {
+  echo "Shutting down $desc ($prog): "
+  pkill -f $prog_bin
+}
+
+restart() {
+    stop
+    start
+}
+
+status() {
+  if [ -z $pid ]; then
+     pid=$(pgrep -f $prog_bin)
+  fi
+
+  if [ -z $pid ]; then
+    echo "$prog is NOT running."
+    return 1
+  else
+    echo "$prog is running (pid is $pid)."
+  fi
+
+}
+
+case "$1" in
+  start)   start;;
+  stop)    stop;;
+  restart) restart;;
+  status)  status;;
+  *)       echo "Usage: $0 {start|stop|restart|status}"
+           RETVAL=2;;
+esac
+exit $RETVAL
+
+
+3）启动和验证
+
+查看集群成员：
+# etcdctl  member list
+或
+# curl http://10.0.34.15:2379/v2/members
+
+检查集群健康状态
+# etcdctl cluster-health
+
+4) etcdctl 操作 
+备份
+#!/bin/bash
+# etcd backup
+data_time=`date +%y%m%d`
+etcdctl backup --data-dir --data-dir=/data/etcd_data/etcd_conf --backup-dir /data/etcd_backup/${data_time}
+find /data/etcd_backup/ -ctime +7 -exec rm -r {} \;
+
+更新一个节点：
+    先查找节点的ID，再根据ID和peerURLs更新节点
+# etcdctl member list
+7ce1cd4d2c6ddf70: name=etcd_conf2 peerURLs=http://10.0.34.16:2380 clientURLs=http://10.0.34.16:2379 isLeader=false
+af4336fe651e754e: name=etcd_conf1 peerURLs=http://10.0.34.15:2380 clientURLs=http://10.0.34.15:2379 isLeader=false
+e6201654532e3b82: name=etcd_conf3 peerURLs=http://10.0.34.17:2380 clientURLs=http://10.0.34.17:2379 isLeader=true
+
+# etcdctl member update 7ce1cd4d2c6ddf70  http://10.0.34.16:2380
+
+删除一个节点：
+# etcdctl member remove 7ce1cd4d2c6ddf70
+
+执行完后，目标节点会自动停止服务，并且打印一行日志：
+etcd: this member has been permanently removed from the cluster. Exiting.
+
+增加一个新的节点：
+    通过etcdctl或对应的API注册新节点
+    使用恰当的参数启动新节点
+# etcdctl member add etcd_conf3 http://10.0.34.17:2380
+ETCD_NAME="etcd_conf3"
+ETCD_INITIAL_CLUSTER="etcd_conf1=http://10.0.34.15:2380,etcd_conf2=http://10.0.34.16:2380,etcd_conf3=http://10.0.34.17:2380"
+ETCD_INITIAL_CLUSTER_STATE=existing
+etcdctl 在注册完新节点后，会返回一段提示，包含3个环境变量。然后在第二部启动新节点的时候，带上这3个环境变量即可。
+
+# export ETCD_NAME="etcd_conf3"
+# export ETCD_INITIAL_CLUSTER="etcd_conf1=http://10.0.34.15:2380,etcd_conf2=http://10.0.34.16:2380,etcd_conf3=http://10.0.34.17:2380"
+# export ETCD_INITIAL_CLUSTER_STATE=existing
+启动
+# etcd -listen-client-urls http://10.0.34.17:2379 -advertise-client-urls http://10.0.34.17:2379  -listen-peer-urls http://10.0.34.17:2380 -initial-advertise-peer-urls http://10.0.34.17:2380 -data-dir %data_dir%
+
+故障恢复：
+    从剩余的正常节点，使用etcdctl backup 命令备份etcd数据
+    将数据恢复到新的节点，使用 --force-new-cluster 参数启动etcd服务，这个参数会重置集群ID和集群的所有成员信息，其中节点的监听地址会被重置为localhost:2379, 表示集群中只有一个节点
+    启动完后对单节点的etcd的数据进行验证，无误后通过api修改节点的监听地址
+由于etcdctl不具备修改成员节点参数的功能，只能用api来完成
+# curl http://127.0.0.1:2379/v2/members/XXXXX -XPUT \
+-H "Content-Type:application/json" -d '{"peerURLs":["http://127.0.0.1:2580"]}'
+
+
+扩展etcd集群
+    在集群的任何一台etcd节点上执行，将新节点注册到集群
+# curl http://127.0.0.1:2379/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://192.168.73.172:2380"]}'
+
+    在新节点上启动etcd，注意 --initial-cluster-state 参数为 existing
+# etcd \
+-name etcd03 \
+-advertise-client-urls http://192.168.73.150:2379,http://192.168.73.150:4001 \
+-listen-client-urls http://0.0.0.0:2379 \
+-initial-advertise-peer-urls http://192.168.73.150:2380 \
+-listen-peer-urls http://0.0.0.0:2380 \
+-initial-cluster-token etcd-cluster \
+-initial-cluster "etcd01=http://192.168.73.140:2380,etcd02=http://192.168.73.137:2380,etcd03=http://192.168.73.150:2380" \
+-initial-cluster-state existing
+
+# etcdctl cluster-health
+
+
+etcd 数据迁移：
+    备份数据
+    用 --force-new-cluster 初始新的集群，抹除旧etcd的一些属性信息
+    添加集群新成员，再用--initial-cluster-state existing启动
+
+
+
+
+
+
+
+
