@@ -1,7 +1,7 @@
 
 etcd tls集群安装
 
-1）科普 ca
+### 1）科普 ca
 
 认识几个概念：SSL、TLS、HTTPS、X.509、CRT、CSR、PEM
 
@@ -41,9 +41,10 @@ CFSSL支持以下三种私钥保护模式：
 
 SSL/TSL 认证分单向认证和双向认证两种方式。简单说就是单向认证只是客户端对服务端的身份进行验证，双向认证是客户端和服务端互相进行身份认证
 
-使用CFSSL生成CA证书和私钥
+### 2）使用CFSSL生成CA证书和私钥
 
 1 安装 CFSSL,二进制安装
+``` shell
 # wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
 # chmod +x cfssl_linux-amd64
 # mv cfssl_linux-amd64 /usr/local/bin/cfssl
@@ -55,8 +56,8 @@ SSL/TSL 认证分单向认证和双向认证两种方式。简单说就是单向
 # wget https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64
 # chmod +x cfssl-certinfo_linux-amd64
 # mv cfssl-certinfo_linux-amd64 /usr/local/bin/cfssl-certinfo
-
-创建 CA 配置文件
+```
+2 创建 CA 配置文件
 
 ca信息：
 Common Name             CN: My CA
@@ -66,12 +67,12 @@ Locality                L=(城市或区域名称)
 State or Province       ST=(州或省份名称)
 Country                 C=(单位的两字母国家代码)
 
-
+``` shell
 # mkdir ssl
 # cd ssl
 
 # cfssl print-defaults csr > csr.json
-
+```
 初始化证书颁发机构,修改csr.json的ca信息：
 ``` json
 {
@@ -93,29 +94,33 @@ Country                 C=(单位的两字母国家代码)
 ``` 
 
 生成 CA 证书：
+```shell
 # cfssl gencert -initca csr.json | cfssljson -bare ca -
-
+```
 将会生成以下几个文件：
+
     ca-key.pem
     ca.csr
     ca.pem
     请务必保证 ca-key.pem 文件的安全，*.csr 文件在整个过程中不会使用
 
 
+配置 CA 选项,修改config.json,分别配置针对三种不同证书类型的profiles,期中有效期43800h为5年:
 
-配置 CA 选项,修改config.json,分别配置针对三种不同证书类型的profiles,期中有效期43800h为5年
-config.json：可以定义多个 profiles，分别指定不同的过期时间、使用场景等参数；后续在签名证书时使用某个 profile；
-signing：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA=TRUE；
-server auth：表示client可以用该 CA 对server提供的证书进行验证；
-client auth：表示server可以用该CA对client提供的证书进行验证
+    config.json：可以定义多个 profiles，分别指定不同的过期时间、使用场景等参数；后续在签名证书时使用某个 profile；
+    signing：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA=TRUE；
+    server auth：表示client可以用该 CA 对server提供的证书进行验证；
+    client auth：表示server可以用该CA对client提供的证书进行验证
 
 
 etcd 涉及到三类证书：
-client certificate 用于通过服务器验证客户端。例如etcdctl，etcd proxy，fleetctl或docker客户端。
-server certificate 由服务器使用，并由客户端验证服务器身份。例如docker服务器或kube-apiserver。
-peer certificate 由 etcd 集群成员使用，供它们彼此之间通信使用
 
+    client certificate 用于通过服务器验证客户端。例如etcdctl，etcd proxy，fleetctl或docker客户端。
+    server certificate 由服务器使用，并由客户端验证服务器身份。例如docker服务器或kube-apiserver。
+    peer certificate 由 etcd 集群成员使用，供它们彼此之间通信使用
+```shell
 # cfssl print-defaults config > config.json
+```
 config.json
 ``` json
 {
@@ -159,20 +164,24 @@ config.json
 etcd 通过命令行或环境变量获取几个证书相关的配置
 
 1）客户端到服务器的通信：
---cert-file    设置此选项后，通告-客户端-URL可以使用HTTPS架构
---key-file     证书的密钥，必须是末加密的
---trusted-ca-file
---auto-tls
+    
+    --cert-file    设置此选项后，通告-客户端-URL可以使用HTTPS架构
+    --key-file     证书的密钥，必须是末加密的
+    --trusted-ca-file
+    --auto-tls
 
 2)对等通信：
---peer-cert-file
---peer-key-file
---peer-trusted-ca-file
---peer-auto-tls
+
+    --peer-cert-file
+    --peer-key-file
+    --peer-trusted-ca-file
+    --peer-auto-tls
 
 
 server端证书：
+```shell
 # cfssl print-defaults csr > server.json
+```
 server.json
 ``` json
 {
@@ -199,9 +208,11 @@ server.json
 }
 ```
 生成server端证书及private.key
+``` shell
 # cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=config.json -profile=server server.json | cfssljson -bare server
-
+```
 将会生成如下文件：
+
 	server-key.pem
 	server.csr
 	server.pem
@@ -235,8 +246,9 @@ client.json
 ```
 
 生成client certificate
+```shell
 # cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=config.json -profile=client client.json |  cfssljson -bare client
-
+```
 对等证书：
 member.json
 ``` json
@@ -264,7 +276,21 @@ member.json
 }
 ```
 生成 member certificate与private key
+```shell
 # cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=config.json -profile=peer member.json |  cfssljson -bare member
+```
+得到如下文件：
+
+	member-key.pem
+	member.csr
+	member.pem
+
+
+
+
+
+
+
 
 
 
