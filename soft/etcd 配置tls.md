@@ -22,7 +22,6 @@ PEM：（Privacy Enhanced Mail）, 是 X.509 的一种编码格式（以"-----BE
 OpenSSL： 是一个安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。
 
 
-
 公钥基础设施（public key infrastructure，缩写为PKI）
 认证中心（CA）
 
@@ -32,7 +31,6 @@ PKI借助数字证书和公钥加密技术提供可信任的网络身份。通�
     证书颁发组织的信息
     证书颁发组织授予的权限，如证书有效期、适用的主机名、用途等
     使用证书颁发组织私钥创建的数字签名
-
 
 CFSSL支持以下三种私钥保护模式：
     “硬件安全模块（Hardware Security Module，缩写为HSM）
@@ -100,10 +98,9 @@ Country                 C=(单位的两字母国家代码)
 将会生成以下几个文件：
 
     ca-key.pem
-    ca.csr
     ca.pem
+    ca.csr
     请务必保证 ca-key.pem 文件的安全，*.csr 文件在整个过程中不会使用
-
 
 配置 CA 选项,修改config.json,分别配置针对三种不同证书类型的profiles,期中有效期43800h为5年:
 
@@ -111,7 +108,6 @@ Country                 C=(单位的两字母国家代码)
     signing：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA=TRUE；
     server auth：表示client可以用该 CA 对server提供的证书进行验证；
     client auth：表示server可以用该CA对client提供的证书进行验证
-
 
 etcd 涉及到三类证书：
 
@@ -158,8 +154,6 @@ config.json
     }
 }
 ```
-
-
 
 etcd 通过命令行或环境变量获取几个证书相关的配置
 
@@ -214,9 +208,8 @@ server.json
 将会生成如下文件：
 
 	server-key.pem
-	server.csr
 	server.pem
-
+	server.csr
 
 client端证书：
 client.json
@@ -244,11 +237,16 @@ client.json
     ]
 }
 ```
-
 生成client certificate
 ```shell
 # cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=config.json -profile=client client.json |  cfssljson -bare client
 ```
+得到如下文件：
+
+	client-key.pem
+	client.pem
+	client.csr 
+
 对等证书：
 member.json
 ``` json
@@ -282,12 +280,152 @@ member.json
 得到如下文件：
 
 	member-key.pem
-	member.csr
 	member.pem
+	member.csr    
+
+3 etcd 安装
+
+https://github.com/coreos/etcd/releases 这里下面最新版本 v3.3.2
+```shell
+# wget https://github.com/coreos/etcd/releases/download/v3.3.2/etcd-v3.3.2-linux-arm64.tar.gz
+```
+解压缩etcd-v3.1.6-linux-amd64.tar.gz，将其中的etcd和etcdctl两个可执行文件复制到各节点的/usr/bin目录
+
+在各节点创建etcd的数据目录：
+```shell
+# mkdir -p /var/lib/etcd
+```
+在各节点创建tls证书目录,并copy证书：
+```shell
+# mkdir -p /etc/etcd/ssl/
+# cp ca.pem server.pem server-key.pem member.pem member-key.pem /etc/etcd/ssl/
+```
 
 
+在每个节点上创建etcd的systemd unit文件/usr/lib/systemd/system/etcd.service，注意替换ETCD_NAME和INTERNAL_IP变量的值：
+```shell
+# cat > /usr/lib/systemd/system/etcd.service <<EOF
+[Unit]
+Description=etcd server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/etcd/
+EnvironmentFile=-/etc/etcd/etcd.conf
+ExecStart=/usr/bin/etcd \
+  --name node1 \
+  --cert-file=/etc/etcd/ssl/server.pem \
+  --key-file=/etc/etcd/ssl/server-key.pem \
+  --peer-cert-file=/etc/etcd/ssl/member.pem \
+  --peer-key-file=/etc/etcd/ssl/member-key.pem \
+  --client-cert-auth --trusted-ca-file=/etc/etcd/ssl/ca.pem \
+  --peer-client-cert-auth --peer-trusted-ca-file=/etc/etcd/ssl/ca.pem \
+  --initial-advertise-peer-urls https://192.168.220.101:2380 \
+  --listen-peer-urls https://192.168.220.101:2380 \
+  --listen-client-urls https://192.168.220.101:2379,https://127.0.0.1:2379 \
+  --advertise-client-urls https://192.168.220.101:2379 \
+  --initial-cluster-token etcd-cluster-1 \
+  --initial-cluster node1=https://192.168.220.101:2380,node2=https://192.168.220.102:2380,node3=https://192.168.220.103:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+参数说明：
+
+    启动参数中指定了etcd的工作目录和数据目录是/var/lib/etcd
+    --cert-file和--key-file分别指定etcd的公钥证书和私钥
+    --peer-cert-file和--peer-key-file分别指定了etcd的Peers通信的公钥证书和私钥。
+    --trusted-ca-file指定了客户端的CA证书
+    --peer-trusted-ca-file指定了Peers的CA证书
+    --initial-cluster-state new表示这是新初始化集群
 
 
+YUM 方式安装则可以在配置文件修改
+```shell
+# yum install  -y etcd
+# vim /etc/etcd/etcd.conf
+```
+``` ini
+# [member]
+ETCD_NAME=etcd1
+ETCD_DATA_DIR="/var/lib/etcd/etcd1.etcd"
+ETCD_WAL_DIR="/var/lib/etcd/wal"
+ETCD_SNAPSHOT_COUNT="100"
+ETCD_HEARTBEAT_INTERVAL="100"
+ETCD_ELECTION_TIMEOUT="1000"
+ETCD_LISTEN_PEER_URLS="https://192.168.220.101:2380"
+ETCD_LISTEN_CLIENT_URLS="https://192.168.220.101:2379,http://127.0.0.1:2379"
+ETCD_MAX_SNAPSHOTS="5"
+ETCD_MAX_WALS="5"
+#ETCD_CORS=""
+
+# [cluster]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.220.101:2380"
+ETCD_INITIAL_CLUSTER="etcd1=https://192.168.220.101:2380,etcd2=https://192.168.220.102:2380,etcd3=https://192.168.220.103:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="k8s-etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="https://192.168.220.101:2379"
+#ETCD_DISCOVERY=""
+#ETCD_DISCOVERY_SRV=""
+#ETCD_DISCOVERY_FALLBACK="proxy"
+#ETCD_DISCOVERY_PROXY=""
+#ETCD_STRICT_RECONFIG_CHECK="false"
+#ETCD_AUTO_COMPACTION_RETENTION="0"
+
+# [proxy]
+#ETCD_PROXY="off"
+#ETCD_PROXY_FAILURE_WAIT="5000"
+#ETCD_PROXY_REFRESH_INTERVAL="30000"
+#ETCD_PROXY_DIAL_TIMEOUT="1000"
+#ETCD_PROXY_WRITE_TIMEOUT="5000"
+#ETCD_PROXY_READ_TIMEOUT="0"
+
+# [security]
+ETCD_CERT_FILE="/etc/etcd/ssl/server.pem"
+ETCD_KEY_FILE="/etc/etcd/ssl/server-key.pem"
+ETCD_CLIENT_CERT_AUTH="true"
+ETCD_TRUSTED_CA_FILE="/etc/etcd/ssl/ca.pem"
+ETCD_AUTO_TLS="true"
+ETCD_PEER_CERT_FILE="/etc/etcd/ssl/member.pem"
+ETCD_PEER_KEY_FILE="/etc/etcd/ssl/member-key.pem"
+ETCD_PEER_CLIENT_CERT_AUTH="true"
+ETCD_PEER_TRUSTED_CA_FILE="/etc/etcd/ssl/ca.pem"
+ETCD_PEER_AUTO_TLS="true"
+
+# [logging]
+#ETCD_DEBUG="false"
+# examples for -log-package-levels etcdserver=WARNING,security=DEBUG
+#ETCD_LOG_PACKAGE_LEVELS=""
+```    
+
+其它节点修改对应的 ETCD_NAME 和 ip
+
+启动etcd 
+```shell
+# systemctl daemon-reload
+# systemctl enable etcd
+# systemctl start etcd
+# systemctl status etcd
+```
+
+检查集群是否健康，在任一节点执行：
+```shell
+# etcdctl --ca-file=/etc/etcd/ssl/ca.pem \
+  --cert-file=/etc/etcd/ssl/server.pem \
+  --key-file=/etc/etcd/ssl/server-key.pem \
+  --endpoints=https://node1:2379,https://node2:2379,https://node3:2379 \
+  cluster-health
+```
+确保cluster is healthy
 
 
 
