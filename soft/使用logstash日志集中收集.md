@@ -87,5 +87,16 @@ output {
 参数说明：
   
     threads: 启用线程数量
+
+logstash 启动 
+``` shell
+# sudo -u logstash /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/logfile.yml &
+```
+启动参数说明：
+
+    -f： 指定配置文件
+    -t:  检测配置文件的语法是否正确
+
+
     
     
