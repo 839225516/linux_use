@@ -320,7 +320,7 @@ path.data: /data/elasticsearchdata/data
 path.logs: /data/elasticsearchdata/logs
 bootstrap.memory_lock: false
 bootstrap.system_call_filter: false
-network.host: 172.20.20.183
+network.host: 172.20.20.184
 transport.tcp.port: 9300
 http.port: 9200
 http.cors.enabled: true
@@ -399,8 +399,22 @@ output.redis:
   datatype: list
 ```
 
+-------
+查看集群健康状态：
+```shell
+# curl -XGET http://172.20.20.183:9200/_cat/health?v
+```
 
+查看所有索引
+```shell
+# curl -XGET http://172.20.20.183:9200/_cat/indices?v
+```
 
+删除索引
+```shell 
+# curl -XDELETE 'http://localhost:9200/filebeat-2016.12.28'
+# curl -XDELETE  'http://127.0.0.1:9200/*2017.*'
+```
 
 
 
