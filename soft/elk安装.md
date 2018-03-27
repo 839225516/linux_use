@@ -1,6 +1,7 @@
 ELK日志分析系统安装
 
 elk架构：
+
 ![elk架构图](images/logstash-arch.jpg)
 
 准备工作：
