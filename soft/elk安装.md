@@ -126,6 +126,10 @@ aof-rewrite-incremental-fsync yes
 启动redis:
 ```shell 
 # /usr/local/redis/bin/redis-server /etc/redis/redis.conf
+
+查看redis数据
+# redis-cli
+# lrange logstash:redis 0 -1
 ```
 
 ### 3 安装logstash ###
