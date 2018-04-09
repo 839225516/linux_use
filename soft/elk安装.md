@@ -43,7 +43,7 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 # yum install tcl
 # tar zxf redis-4.0.8.tar.gz
 # cd redis-4.0.8
-# make 
+# make MALLOC=libc 
 # make test
 # make install PREFIX=/usr/local/redis
 ```
