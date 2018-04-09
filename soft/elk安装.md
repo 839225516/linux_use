@@ -360,7 +360,7 @@ export ES_HEAP_SIZE=10g
 # systemctl start elasticsearch.service
 ```
 
-### elasticsearch-head （可选）###
+### elasticsearch-head （可选） ###
 ``` shell 
 # git clone git://github.com/mobz/elasticsearch-head.git
 # yum update openssl -y
