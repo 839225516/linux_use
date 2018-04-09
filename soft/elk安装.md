@@ -220,6 +220,7 @@ logstash 启动：
 
 当然，这种启动方法不方便管理，最好使用supervisor管理起来
 ``` shell
+# yum -y install epel-release
 # yum -y install supervisord --enablerepo=epel
 ```
 
