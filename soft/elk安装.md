@@ -169,15 +169,15 @@ filter {
 }
  
 output {
-    if [type] == "mpos_java_transaction" {
+    if "mpos_java_transaction" in [tags] {
         elasticsearch {
             hosts => ["10.0.52.4:9200"]
             index => "mpos_log_transaction_%{+YYYY.MM.dd}"
             #document_type => "mpos_log_%{type}"
-            flush_size => 500
-            idle_flush_time => 1
-            sniffing => true
-            template_overwrite => true
+            #flush_size => 500
+            #idle_flush_time => 1
+            #sniffing => true
+            #template_overwrite => true
         }
     } else if [type] == "posp_verity" {
         elasticsearch {
@@ -386,6 +386,7 @@ elasticsearch.url: "http://192.168.1.42:9200"
 ``` yaml
 filebeat.prospectors:
 - input_type: log
+  enable: true
   paths:
     - /data/mpos/xmpos*.log
   multiline.pattern: ^\[
