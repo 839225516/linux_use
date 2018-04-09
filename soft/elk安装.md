@@ -360,6 +360,29 @@ export ES_HEAP_SIZE=10g
 # systemctl start elasticsearch.service
 ```
 
+### elasticsearch-head （可选）###
+``` shell 
+# git clone git://github.com/mobz/elasticsearch-head.git
+# yum update openssl -y
+
+# cd elasticsearch-head
+# npm install
+```
+在ES中配置，在elasticsearch.ymal文件中添加：
+``` yaml
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+```
+启动 ：
+```shell
+# npm install -g grunt
+# grunt server --force &
+```
+
+
+
+
+
 ### 5 kibana 安装 ###
 ```shell
 # rpm -ivh kibana-6.1.3-x86_64.rpm
