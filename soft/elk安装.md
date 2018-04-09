@@ -265,6 +265,13 @@ LimitNOFILE=131072
 LimitNPROC=4096
 ```
 
+创建目录和更改目录权限
+```shell
+# mkdir -p /data/elasticsearchdata/{data,logs}
+# chown -R elasticsearch:elasticsearch /data/elasticsearchdata/
+```
+
+
 es配置文件：
 vim /etc/elasticsearch/elasticsearch.yml
 ```yaml
