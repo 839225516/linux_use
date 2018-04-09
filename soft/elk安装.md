@@ -222,6 +222,8 @@ logstash 启动：
 ``` shell
 # yum -y install epel-release
 # yum -y install supervisord --enablerepo=epel
+# echo_supervisord_conf > /etc/supervisord.conf
+# supervisord -c /etc/supervisord.conf
 ```
 
 supervisor配置：
