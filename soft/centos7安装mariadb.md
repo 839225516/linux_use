@@ -79,7 +79,7 @@ mysql> grant all privileges on *.* to username@'hostname' identified by 'passwd'
 ```
 
 
-6) mariadb 完成安全配置后出现 1045 (28000)
+6)mariadb 完成安全配置后出现 1045 (28000)
 错误信息：
 ```shell 
 mariadb 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
