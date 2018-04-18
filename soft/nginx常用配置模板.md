@@ -64,3 +64,10 @@ server {
    }
 }
 ```
+
+#### 4)文件弹窗下载  #####
+``` conf
+location ~*.(txtpdf|doc|xls)$ {
+	add_header Content-Disposition "attachment;";
+}
+```
