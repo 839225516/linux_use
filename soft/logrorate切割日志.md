@@ -98,5 +98,14 @@ exit 0
 
 
 
+##### 测试配置文件 #####
+-d  debug 
+``` shell 
+# logrotate -d /etc/logrotate.d/agent-profit
+```
 
-
+##### 手动强制触发 #####
+-f 
+``` shell 
+# logrotate -vf /etc/logrotate.d/agent-profit
+```
