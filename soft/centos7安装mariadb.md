@@ -63,7 +63,7 @@ default-character-set=utf8
 ```
 进mariadb查看字符集
 ```shell
-mysql> show variables like "%character%"; show variables likes "%collation%"
+mysql> show variables like "%character%"; show variables like "%collation%";
 ```
 
 5)添加用户
