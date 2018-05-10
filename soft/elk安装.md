@@ -137,9 +137,9 @@ rpm包安装logstash-6.2.2.rpm
 ``` shell 
 # yum localinstall -y logstash-6.2.2.rpm
 ```
-注意： rpm包安装后还要将/etc/logstash软链接到 /usr/share/logstash/conf
+注意： rpm包安装后还要将/etc/logstash软链接到 /usr/share/logstash/config
 ```shell
-# ln -s /etc/logstash /usr/share/logstash/conf
+# ln -s /etc/logstash /usr/share/logstash/config
 ```
 
 logstash 配置文件：vim /etc/logstash/conf.d/logstashd.yml
