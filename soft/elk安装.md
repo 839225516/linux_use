@@ -244,7 +244,7 @@ user = logstash
 redirect_stderr = true
 stdout_logfile_maxbytes = 20MB
 stdout_logfile_backups = 20
-stdout_logfile = tailf /var/log/logstash/logstash.log
+stdout_logfile = /var/log/logstash/logstash.log
 ```
 
 ### 4 elasticsearch集群安装 ###
