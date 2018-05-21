@@ -90,9 +90,12 @@ PKCS#12
     -passin  为私钥密码（nodes为无加密）
     -password 指定p12文件的密码
 
+把pem转成pkcs12格式
 > openssl pkcs12 -export -in ca/cert.crt -inkey ca/rsa_private.key -out ca/server.p12
 
+把pkcs转成crt
 > openssl pkcs12 -in ca/server.p12 -out ca/mycerts.crt -nokeys -clcerts
 
+把crt转成cer
 > openssl x509 -inform pem -in ca/mycerts.crt -outform der -out ca/mycerts.cer
 
