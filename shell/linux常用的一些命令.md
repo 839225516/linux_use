@@ -84,4 +84,21 @@ curl查看 网页的响应时间
 网页或文件大小
 # curl -o /dev/null -s -w %{size_header} url
 
+
+# ls只看当前目录的文件，不看文件夹
+ls -al | grep '^-'
+
+
+linux/unix下的回车符是'0d',而在windows下侧是'0d0a'
+^M 可以用 dos2unix 命令 去除：
+dos2unix filename
+
+不影响使用，是因为windows换行符使用 \r\n 而 Linux使用的是 \n 导致的换行符问题，可以使用tr进行去除
+cat yourfile | tr -s "\r\n" "\n" > newfile
+
+--stdin 修改密码，非交互修改密码
+# echo passwd | passwd --stdin username
+
+
+
 ```
