@@ -68,4 +68,20 @@ dns 查询
 
 # nslookup qq.com 172.20.11.246
 
+
+清理内存缓存
+sync && echo 1 > /proc/sys/vm/drop_caches  
+sync && echo 2 > /proc/sys/vm/drop_caches  
+sync && echo 3 > /proc/sys/vm/drop_caches
+
+
+curl查看 网页的响应时间
+# curl -o /dev/null -s -w "time_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\n"  url
+
+返回码：
+# curl -o /dev/null -s -w %{http_code} "www.qq.com"
+
+网页或文件大小
+# curl -o /dev/null -s -w %{size_header} url
+
 ```
