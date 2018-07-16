@@ -44,17 +44,17 @@ tcpdump依赖libpcap,从网络驱动层抓取数据，不经过任何linux的网
 3）协议过滤
 > tcpdump -i eth0 arp/ip/tcp/udp/icmp
 
-4) or  and
+4）or  and
 > tcpdump -i eth0 -nnn -s 0 '(tcp and port 90) and ((dst host 192.168.1.10) or (dst host 192.168.1.12))' 
 
-5) 只抓 SYN 包
+5）只抓 SYN 包
 > tcpdump -i eth0 'tcp[tcpflags]=tcp-syn'   
 > tcpdump -i eth0 'tcp[tcpflags] & (tcp-syn) != 0'
 
 之捕获TCP SYN或ACK包：
 > tcpdump -i eth0 -nnn 'tcp[tcpflags] & (tcp-syn|tcp-ack) != 0'
 
-6) 抓 DNS 请求数据
+6）抓 DNS 请求数据
 > tcpdump -i eth0 udp dst port 53
 
 
