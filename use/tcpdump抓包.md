@@ -71,6 +71,13 @@ tcpdump对tcp数据包的显示格式：
     urgent      数据包中是否有紧急指针
     option      选项
 
+    
+    SYN 表示建立连接
+    FIN 表示关闭连接
+    ACK 表示响应
+    PSH 表示有 DATA数据传输
+    RST 表示连接重置
+
 下面是对http进行一次完整的抓包
 > tcpdump -i ens18 -nnn 'port 6666'
 ```
