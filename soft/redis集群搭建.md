@@ -170,6 +170,13 @@ aof-rewrite-incremental-fsync yes
 # ruby --version
 # yum install rubygems
 # gem install redis
+
+####################################################
+# 或者手动安装 
+# ruby-2.2.4.tar.bz2   	https://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.4.tar.bz2
+# rubygems-2.5.1.tgz	https://rubygems.global.ssl.fastly.net/rubygems/rubygems-2.5.1.tgz
+# redis-3.2.2.gem	https://rubygems.global.ssl.fastly.net/gems/redis-3.2.2.gem
+####################################################
 ```
 
 #### 用redis-trib.rb构建集群
