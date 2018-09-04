@@ -188,6 +188,18 @@ aof-rewrite-incremental-fsync yes
 使用create命令 --replicas 1 参数表示为每个主节点创建一个从节点，其他参数是实例的地址集合
 
 #### 验证集群是否成功
+```shell 
+#查看&检测群集结点：
+# ./redis-trib.rb check 127.0.0.1:7000
+
+# ./redis-cli -p 7000 cluster nodes 
+
+# 查看群集主节点
+# ./redis-cli -p 7000 cluster nodes |grep master
+```
+
+
+
 客户端连接集群redis-cli需要带上 -c
 ``` shell 
 # redis-cli -h 172.20.20.246 -c -p 7000
