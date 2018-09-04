@@ -93,7 +93,7 @@ daemonize yes
 supervised no
 pidfile /var/run/redis_7000.pid
 loglevel notice
-logfile ""
+logfile "/data/redis-cluster/7000/redis.log"
 databases 16
 always-show-logo yes
 save 900 1
