@@ -180,24 +180,14 @@ output {
             #template_overwrite => true
         }
     } else if [type] == "posp_verity" {
-        elasticsearch {
-            hosts => ["10.0.52.4:9200"]
-            index => "posp_verity_%{+YYYY.MM.dd}"
-            #document_type => "%{type}"
-            flush_size => 500
-            idle_flush_time => 1
-            sniffing => true
-            template_overwrite => true
+        file {
+            path => "/data/logs_backup/posp_trans_crm/crm_%{+YYYY-MM-dd-HH}.log"
+            codec => line { format => "%{message}"}
         }
     } else {
         elasticsearch {
             hosts => ["10.0.52.4:9200"]
             index => "posp_log_%{type}_%{+YYYY.MM.dd}"
-            #document_type => "%{type}"
-            flush_size => 500
-            idle_flush_time => 1
-            sniffing => true
-            template_overwrite => true
         }
     }
 }
