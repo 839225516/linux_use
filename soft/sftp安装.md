@@ -16,7 +16,7 @@
 # passwd sftp
 ```
 
-
+%u 用户名
 活动目录,用chroot将用户的根目录指定到/data/sftp/%u
 目录的权限设定有两个要点：
 1、由ChrootDirectory指定的目录开始一直往上到系统根目录为止的目录拥有者都只能是root
