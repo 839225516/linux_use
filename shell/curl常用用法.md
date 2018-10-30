@@ -38,3 +38,8 @@ curl查看 网页的响应时间
 ```
 
 
+查看外网出口的ip
+```shell 
+# curl -L tool.lu/ip
+```
+
