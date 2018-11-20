@@ -1,5 +1,5 @@
 ##### 硬件优化  ####
-硬件要求(cpu,内存，硬盘)
+硬件要求(cpu,内存，硬盘)  ----> 8C 64G 多盘
 
     cpu: Elasticsearch部署对cpu要求不高，选择具有多个内核的现代处理器，常见的集群使用两到八个核的机器。
     硬盘: 使用raid 0提高I/O,有条件用ssd,没必要做raid的高可用，es通过replicas实现高可用。
@@ -27,6 +27,7 @@ jvm的设置不要高于32G,到底要低于32GB多少：
 内存交换 到磁盘对服务器性能来说是 致命 的。
 
 最好的办法就是在你的操作系统中完全禁用 swap。这样可以暂时禁用：
+sed -i '/swap/s/^/#/' /etc/fstab
 > sudo swapoff -a
 
 如果需要永久禁用，你可能需要修改 /etc/fstab 文件。
@@ -36,6 +37,39 @@ jvm的设置不要高于32G,到底要低于32GB多少：
 
 如果系统层设置不合适，可以设置elasticsearch.yml文件，允许jvm锁住内存，禁止操作系统交换出去：
 > bootstrap.mlockall: true
+
+
+##### 系统调参
+``` shell
+vim /etc/security/limits.conf
+elasticsearch   soft    nofile  65535
+elasticsearch   hard    nofile  65535
+elasticsearch   soft    nproc  65535
+elasticsearch   hard    nproc  65535
+elasticsearch   soft    memlock  unlimited
+elasticsearch   hard    memlock  unlimited
+```
+
+
+##### es的配置
+``` shell
+thread_pool.search.size: 48     # 建议为cpu的2，3倍
+thread_pool.search.queue_size: 20000
+thread_pool.index.size: 9       # cpu +1
+thread_pool.index.queue_size: 40000
+
+#----------------------------
+template模块设置
+    - "codec": "best_compression"   启用压缩
+    - "refresh_interval": "30s"     适当增大数据落盘刷新，提高写入效率，降低segment数量
+    - "number_of_shards": "8"       提高查询效率，一个分片数只能有效利用1核cpu,增加分片数，提高cpu使用率
+```
+
+
+##### 硬盘 多块
+多块磁盘，获得N倍IO性能
+> path.data: /data/elasticsearch/data,/data1/elasticsearch/data[,...]
+
 
 
 
