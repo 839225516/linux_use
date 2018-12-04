@@ -75,16 +75,6 @@ sync && echo 2 > /proc/sys/vm/drop_caches
 sync && echo 3 > /proc/sys/vm/drop_caches
 
 
-curl查看 网页的响应时间
-# curl -o /dev/null -s -w "time_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\n"  url
-
-返回码：
-# curl -o /dev/null -s -w %{http_code} "www.qq.com"
-
-网页或文件大小
-# curl -o /dev/null -s -w %{size_header} url
-
-
 # ls只看当前目录的文件，不看文件夹
 ls -al | grep '^-'
 
@@ -102,3 +92,10 @@ cat yourfile | tr -s "\r\n" "\n" > newfile
 
 
 ```
+
+
+
+
+
+
+
