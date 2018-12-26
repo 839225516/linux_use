@@ -11,14 +11,14 @@
 #Description    :	centos初始化脚本，前提已配置好网络
 ###############################################################
 
-
+IP=`ip a|grep inet |grep -v 127.0.0.1 |grep -v inet6 | awk '{print $2}' |awk -F'/' '{print $1}'`
 
 # 设置时间 hostname 
 Timezone=Asia/Shanghai
-HostName=master
+HostName=devops
 
 timedatectl set-timezone $Timezone
-hostnamectl set-hostname $HostName
+hostnamectl set-hostname ${HostName}-${IP}
 
 
 # 关闭selinux firewalld 及 swap
