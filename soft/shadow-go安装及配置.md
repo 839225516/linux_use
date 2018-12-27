@@ -1,0 +1,152 @@
+####  Shadowsocks Go版安装及配置
+``` shell 
+yum install golang git -yum
+
+# Shadowsocks Go版安装
+go get github.com/shadowsocks/shadowsocks-go/cmd/shadowsocks-server
+go get github.com/shadowsocks/shadowsocks-go/cmd/shadowsocks-local
+cp -rp $GOPATH/bin/{shadowsocks-server,shadowsocks-local} /usr/local/bin/
+```
+
+### 配置文件config.json
+```shell
+cat /etc/ssr/config.json 
+{
+    "server":"0.0.0.0",					//服务器 ip 地址
+    "server_port":8888,					//端口
+    "local_port":1080,
+    "local_address":"127.0.0.1",
+    "password":"*****",					//密码
+    "method": "aes-256-cfb",			//加密方式
+    "timeout":600
+}
+```
+
+#### 启动脚本
+```shell
+ cat /etc/init.d/ssr 
+#!/bin/bash
+
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Check that networking is up.
+[ ${NETWORKING} ="yes" ] || exit 0
+
+NAME=Shadowsocks-go
+DAEMON=/usr/local/bin/shadowsocks-server
+if [ -f /etc/ssr/config.json ]; then
+    CONF=/etc/ssr/config.json
+elif [ -f /etc/ssr/config.json ]; then
+    CONF=/etc/ssr/config.json
+fi
+PID_DIR=/var/run
+PID_FILE=$PID_DIR/shadowsocks-go.pid
+RET_VAL=0
+
+[ -x $DAEMON ] || exit 0
+
+if [ ! -d $PID_DIR ]; then
+    mkdir -p $PID_DIR
+    if [ $? -ne 0 ]; then
+        echo "Creating PID directory $PID_DIR failed"
+        exit 1
+    fi
+fi
+
+if [ ! -f $CONF ]; then
+    echo "$NAME config file $CONF not found"
+    exit 1
+fi
+
+check_running() {
+    if [ -r $PID_FILE ]; then
+        read PID < $PID_FILE
+        if [ -d "/proc/$PID" ]; then
+            return 0
+        else
+            rm -f $PID_FILE
+            return 1
+        fi
+    else
+        return 2
+    fi
+}
+
+do_status() {
+    check_running
+    case $? in
+        0)
+        echo "$NAME (pid $PID) is running..."
+        ;;
+        1|2)
+        echo "$NAME is stopped"
+        RET_VAL=1
+        ;;
+    esac
+}
+
+do_start() {
+    if check_running; then
+        echo "$NAME (pid $PID) is already running..."
+        return 0
+    fi
+    $DAEMON -c $CONF 2>&1 > /dev/null &
+    PID=$!
+    echo $PID > $PID_FILE
+    sleep 0.3
+    if check_running; then
+        echo "Starting $NAME success"
+    else
+        echo "Starting $NAME failed"
+        RET_VAL=1
+    fi
+}
+
+do_stop() {
+    if check_running; then
+        kill -9 $PID
+        rm -f $PID_FILE
+        echo "Stopping $NAME success"
+    else
+        echo "$NAME is stopped"
+        RET_VAL=1
+    fi
+}
+
+do_restart() {
+    do_stop
+    sleep 0.5
+    do_start
+}
+
+case "$1" in
+    start|stop|restart|status)
+    do_$1
+    ;;
+    *)
+    echo "Usage: $0 { start | stop | restart | status }"
+    RET_VAL=1
+    ;;
+esac
+
+exit $RET_VAL
+```
+
+#### 开启firewalld
+```shell
+firewall-cmd --permanent --zone=public --add-port=8888/tcp
+firewall-cmd --permanent --zone=public --add-port=8888/udp
+firewall-cmd --reload
+
+#或者
+firewall-cmd --zone=public --add-port=8888/tcp --permanent
+firewall-cmd --reload
+```
+
+#### 启动
+```shell 
+service ssr start
+service ssr status
+```
