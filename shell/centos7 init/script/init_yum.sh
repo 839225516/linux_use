@@ -21,6 +21,7 @@ function Install_Necessary_Tools {
 	yum install net-tools -y > /dev/null
 	yum install lrzsz -y > /dev/null	
 	yum install ntpdate -y > /dev/null
+	yum install rsync -y > /dev/null
 }
 
 function Change_Yum_Repo {
