@@ -150,3 +150,48 @@ firewall-cmd --reload
 service ssr start
 service ssr status
 ```
+
+
+### 安装privoxy，用http代理socks5
+```shell 
+yum install privoxy
+```
+
+配置privosy
+```conf
+confdir /etc/privoxy
+logdir /var/log/privoxy
+actionsfile match-all.action # Actions that are applied to all sites and maybe overruled later on.
+actionsfile default.action   # Main actions file
+actionsfile user.action      # User customizations
+filterfile default.filter
+filterfile user.filter      # User customizations
+logfile logfile
+debug   1           # show each GET/POST/CONNECT request
+debug   4096        # Startup banner and warnings
+debug   8192        # Errors - *we highly recommended enabling this*
+toggle  1
+enable-remote-toggle  0
+enable-remote-http-toggle  0
+enable-edit-actions 0
+enforce-blocks 0
+buffer-limit 4096
+enable-proxy-authentication-forwarding 0
+forwarded-connect-retries  0
+accept-intercepted-requests 0
+allow-cgi-request-crunching 0
+split-large-forms 0
+keep-alive-timeout 5
+tolerate-pipelining 1
+socket-timeout 300
+listen-address 0.0.0.0:18888
+# 添加socks5配置
+forward-socks5 / 127.0.0.1:8888 .
+forward-socks5 .google.com 127.0.0.1:8888 .  # 访问google用socks5代理
+```
+
+启动：
+```shell
+systemctl start privoxy
+systemctl enable privoxy
+```
