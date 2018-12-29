@@ -35,7 +35,7 @@ sudo pacman -S zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # 更换默认的shell
-sudo chsh -s /bin/zsha
+chsh -s /bin/zsh
 
 ```
 
