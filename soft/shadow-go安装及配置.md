@@ -143,7 +143,7 @@ shadowsocks-local的配置文件/etc/ssr-local/config.json
         "local_port": 1081,
         "server_password": [
                 ["21.121.22.54:18008", "12345", "aes-256-cfb"],
-                ["174.137.50.197:18081", "123456", "aes-256-cfb"]
+                ["132.165.123.63:18081", "123456", "aes-256-cfb"]
         ]
 }
 ```
