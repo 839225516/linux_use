@@ -135,6 +135,139 @@ esac
 exit $RET_VAL
 ```
 
+
+##### 配置 shadowsocks-local
+shadowsocks-local的配置文件/etc/ssr-local/config.json
+```json
+{
+        "local_port": 1081,
+        "server_password": [
+                ["21.121.22.54:18008", "12345", "aes-256-cfb"],
+                ["174.137.50.197:18081", "123456", "aes-256-cfb"]
+        ]
+}
+```
+shadowsocks-local的启动文件
+```shell
+#!/bin/bash
+
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Check that networking is up.
+[ ${NETWORKING} ="yes" ] || exit 0
+
+NAME=Shadowsocks-go-local
+DAEMON=/usr/local/bin/shadowsocks-local
+if [ -f /etc/ssr-local/config.json ]; then
+    CONF=/etc/ssr-local/config.json
+elif [ -f /etc/ssr-local/config.json ]; then
+    CONF=/etc/ssr-local/config.json
+fi
+PID_DIR=/var/run
+PID_FILE=$PID_DIR/shadowsocks-go-local.pid
+LOG_FILE=/var/log/ssrlocal.log
+RET_VAL=0
+
+[ -x $DAEMON ] || exit 0
+
+if [ ! -d $PID_DIR ]; then
+    mkdir -p $PID_DIR
+    if [ $? -ne 0 ]; then
+        echo "Creating PID directory $PID_DIR failed"
+        exit 1
+    fi
+fi
+
+if [ ! -f $CONF ]; then
+    echo "$NAME config file $CONF not found"
+    exit 1
+fi
+
+check_running() {
+    if [ -r $PID_FILE ]; then
+        read PID < $PID_FILE
+        if [ -d "/proc/$PID" ]; then
+            return 0
+        else
+            rm -f $PID_FILE
+            return 1
+        fi
+    else
+        return 2
+    fi
+}
+
+do_status() {
+    check_running
+    case $? in
+        0)
+        echo "$NAME (pid $PID) is running..."
+        ;;
+        1|2)
+        echo "$NAME is stopped"
+        RET_VAL=1
+        ;;
+    esac
+}
+
+do_start() {
+    if check_running; then
+        echo "$NAME (pid $PID) is already running..."
+        return 0
+    fi
+    $DAEMON -d -c $CONF 2>&1 >> $LOG_FILE  &
+    PID=$!
+    echo $PID > $PID_FILE
+    sleep 0.3
+    if check_running; then
+        echo "Starting $NAME success"
+    else
+        echo "Starting $NAME failed"
+        RET_VAL=1
+    fi
+}
+
+do_stop() {
+    if check_running; then
+        kill -9 $PID
+        rm -f $PID_FILE
+        echo "Stopping $NAME success"
+    else
+        echo "$NAME is stopped"
+        RET_VAL=1
+    fi
+}
+
+do_restart() {
+    do_stop
+    sleep 0.5
+    do_start
+}
+
+case "$1" in
+    start|stop|restart|status)
+    do_$1
+    ;;
+    *)
+    echo "Usage: $0 { start | stop | restart | status }"
+    RET_VAL=1
+    ;;
+esac
+
+exit $RET_VAL
+```
+
+测试
+```shell
+#使用代理访问
+curl --socks5 127.0.0.1:1086 http://cip.cc  
+#不使用代理访问
+curl http://cip.cc 
+```
+
+
 #### 开启firewalld
 ```shell
 firewall-cmd --permanent --zone=public --add-port=8888/tcp
