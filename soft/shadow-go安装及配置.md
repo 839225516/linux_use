@@ -262,7 +262,7 @@ exit $RET_VAL
 测试
 ```shell
 #使用代理访问
-curl --socks5 127.0.0.1:1086 http://cip.cc  
+curl --socks5 127.0.0.1:1081 http://cip.cc  
 #不使用代理访问
 curl http://cip.cc 
 ```
