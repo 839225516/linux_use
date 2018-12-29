@@ -1,6 +1,6 @@
 ####  Shadowsocks Go版安装及配置
 ``` shell 
-yum install golang git -yum
+yum install golang git -y
 
 # Shadowsocks Go版安装
 go get github.com/shadowsocks/shadowsocks-go/cmd/shadowsocks-server
