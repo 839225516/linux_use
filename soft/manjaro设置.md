@@ -60,6 +60,7 @@ sudo pacman -S electronic-wechat 　　　　　　　　　　#微信
 sudo pacman -S netease-cloud-music 　　　　　　　　 #网易云音乐
 sudo pacman -S pycharm 　　　　　　　　　　　　　　#代码编辑器（IDE）
 sudo pacman -S python-pip　　　　　　　　　　　　　 #python用到的一个什么东西
+pacman -S visual-studio-code-bin                # vs code
 ```
 
 
