@@ -45,7 +45,7 @@ Type=simple
 WorkingDirectory=/tmp
 User=root
 Group=root
-ExecStart=/usr/soft/polipo/polipo -c /etc/polipo/config
+ExecStart=/usr/local/bin/polipo -c /etc/polipo/config
 Restart=always
 SyslogIdentifier=Polipo
 
