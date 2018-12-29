@@ -43,6 +43,7 @@ elif [ -f /etc/ssr/config.json ]; then
 fi
 PID_DIR=/var/run
 PID_FILE=$PID_DIR/shadowsocks-go.pid
+LOG_FILE=/var/log/ssr.log
 RET_VAL=0
 
 [ -x $DAEMON ] || exit 0
@@ -92,7 +93,7 @@ do_start() {
         echo "$NAME (pid $PID) is already running..."
         return 0
     fi
-    $DAEMON -c $CONF 2>&1 > /dev/null &
+    $DAEMON -d -c $CONF 2>&1 >> $LOG_FILE &
     PID=$!
     echo $PID > $PID_FILE
     sleep 0.3
