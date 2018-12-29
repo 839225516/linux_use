@@ -9,12 +9,13 @@ sudo pacman -S vim
 
 
 #更换软件源：
-vim  /etc/pacman.d/mirrors
+sudo vim  /etc/pacman.d/mirrors
 ## 清华大学
 Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 
 
 # 添加archlinxCN源
+sudo vim /etc/pacman.conf
 [archlinuxcn]
 SigLevel = Optional TrustedOnly
 Server =https://mirrors.ustc.edu.cn/archlinuxcn/$arch
@@ -34,7 +35,7 @@ sudo pacman -S zsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # 更换默认的shell
-sudo chsh -s /bin/zsha
+chsh -s /bin/zsh
 
 ```
 
@@ -59,6 +60,7 @@ sudo pacman -S electronic-wechat 　　　　　　　　　　#微信
 sudo pacman -S netease-cloud-music 　　　　　　　　 #网易云音乐
 sudo pacman -S pycharm 　　　　　　　　　　　　　　#代码编辑器（IDE）
 sudo pacman -S python-pip　　　　　　　　　　　　　 #python用到的一个什么东西
+sudo pacman -S visual-studio-code-bin                # vs code
 ```
 
 
