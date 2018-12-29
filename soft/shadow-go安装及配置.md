@@ -167,6 +167,9 @@ actionsfile user.action      # User customizations
 filterfile default.filter
 filterfile user.filter      # User customizations
 logfile logfile
+debug   1           # show each GET/POST/CONNECT request
+debug   4096        # Startup banner and warnings
+debug   8192        # Errors - *we highly recommended enabling this*
 toggle  1
 enable-remote-toggle  0
 enable-remote-http-toggle  0
