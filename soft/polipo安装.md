@@ -12,11 +12,11 @@ make all
 make install 
 cp polipo /usr/local/bin/
 
-mkdir /opt/polipo
+mkdir /etc/polipo
 
 ```
 
-vim /opt/polipo/config
+vim /etc/polipo/config
 ```conf
 logSyslog = true
 socksParentProxy = "localhost:1080"
@@ -45,7 +45,7 @@ Type=simple
 WorkingDirectory=/tmp
 User=root
 Group=root
-ExecStart=/usr/soft/polipo/polipo -c /opt/polipo/config
+ExecStart=/usr/soft/polipo/polipo -c /etc/polipo/config
 Restart=always
 SyslogIdentifier=Polipo
 
