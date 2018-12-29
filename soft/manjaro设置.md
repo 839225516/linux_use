@@ -9,12 +9,13 @@ sudo pacman -S vim
 
 
 #更换软件源：
-vim  /etc/pacman.d/mirrors
+sudo vim  /etc/pacman.d/mirrors
 ## 清华大学
 Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 
 
 # 添加archlinxCN源
+sudo vim /etc/pacman.conf
 [archlinuxcn]
 SigLevel = Optional TrustedOnly
 Server =https://mirrors.ustc.edu.cn/archlinuxcn/$arch
