@@ -21,3 +21,29 @@ cd ${existing_git_repo}
 git remote add origiin https://github.com/****/***.git
 git push -u origin master
 ```
+
+3. 更新远程代码到本地 git fetch   
+fetch 更新本地仓库的两种方式
+```shell 
+# 从远程的origin仓库的master分支下载代码到本地的origin master
+git fetch origin master
+
+# 比较本地的仓库和远程参考的区别
+git log -p master.. origin/master
+
+# 把远程下载下来的代码合并到本地仓库，远程的和本地的合并
+git merge origin/master
+
+######################################### 
+# 从远程的origin仓库的master分支下载到本地并新建一个分支temp
+git fetch origin master:temp
+
+# 比较master分支和temp分支的不同
+git deff temp
+
+# 合并master分支和temp分支的不同
+git merge temp
+
+# 删除temp
+git branch -d temp
+```
