@@ -4,6 +4,15 @@
 ```shell
 git config --global user.name  "onliny"
 git config --global user.email "****@qq.com"
+
+#永久记住密码
+git config --global credential.helper store
+
+##临时记住密码默认记住15分钟：
+git config –global credential.helper cache
+
+#自定义配置记住1小时：
+git config credential.helper ‘cache –timeout=3600’
 ```
 
 2. 创建git仓库并提交到远程仓库
