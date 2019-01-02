@@ -27,7 +27,7 @@ git push -u origin master
 
 ### 对已有项目进行提交
 cd ${existing_git_repo}
-git remote add origiin https://github.com/****/***.git
+git remote add origin https://github.com/****/***.git
 git push -u origin master
 ```
 
