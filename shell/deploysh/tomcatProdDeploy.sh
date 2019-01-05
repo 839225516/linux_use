@@ -13,13 +13,14 @@ stop=`${DIR}/bin/bin/shutdown.sh`
 echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        $stop  \e[0m"
 
 ### backup 
-echo -e "\n\n\e[1;34m$(date +%Y/%m/%d-%H:%M:%S)    2) backup   \e[0m"
-echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        cd webapps/ && tar zcf ROOT.bak$(date +%y%m%d_%H%M).tgz ROOT && cd $DIR  \e[0m"
-mvlib=`cd webapps/ && tar zcf ROOT.bak$(date +%y%m%d_%H%M).tgz ROOT && cd $DIR`
-
-echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        cd webapps/ROOT/WEB-INF/classes && \cp -pf log4j.properties servicemanage.properties  $DIR/tmp/ && cd $DIR  \e[0m"
-mvconf=`cd webapps/ROOT/WEB-INF/classes && \cp -pf log4j.properties servicemanage.properties  $DIR/tmp/ && cd $DIR`
+echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        mkdir -p tmp && cd webapps/ROOT/WEB-INF/classes && \cp -pf log4j.properties config.properties  $DIR/tmp/ && cd $DIR  \e[0m"
+mvconf=`mkdir -p tmp && cd webapps/ROOT/WEB-INF/classes && \cp -pf log4j.properties config.properties  $DIR/tmp/ && cd $DIR`
 echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        $mvconf  \e[0m"
+
+ 
+echo -e "\n\n\e[1;34m$(date +%Y/%m/%d-%H:%M:%S)    2) backup   \e[0m"
+echo -e "\n\n\e[1;35m$(date +%Y/%m/%d-%H:%M:%S)        cd webapps/ && tar zcf ROOT.bak$(date +%y%m%d_%H%M).tgz ROOT && rm -rf ROOT && cd $DIR  \e[0m"
+mvlib=`cd webapps/ && tar zcf ROOT.bak$(date +%y%m%d_%H%M).tgz ROOT && rm -rf ROOT  && cd $DIR`
 
 ### rsync lib from 10.0.16.5
 echo -e "\n\n\e[1;34m$(date +%Y/%m/%d-%H:%M:%S)    3) rsync lib from 10.0.16.5  \e[0m"
