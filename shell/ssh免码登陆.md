@@ -28,7 +28,7 @@ ssh-keygen -t dsa -f /root/.ssh/id_dsa  -P ""
 
 cd ~/.ssh && ssh-keygen -t dsa -f ./id_dsa  -P ""
 
-cd ~/.ssh && ssh-keygen -t rsa -f ./id_dsa  -P ""
-mkdir .ssh && chmod 700 .ssh && cd ~/.ssh && ssh-keygen -t rsa -f ./id_dsa  -P ""
+cd ~/.ssh && ssh-keygen -t rsa -f ./id_rsa  -P ""
+mkdir .ssh && chmod 700 .ssh && cd ~/.ssh && ssh-keygen -t rsa -f ./id_rsa  -P ""
 ```
 在要登录的服务的.ssh目录下的authorized_keys文件中添加 id_dsa.pub 的内容
