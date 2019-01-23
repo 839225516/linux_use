@@ -10,7 +10,7 @@ if [ "$#" -eq "1" ];then
     url=$1
 else
     echo -e "Usage: $0 url\n   eg: $0 www.jlpay.com"
-	exit 1
+    exit 1
 fi
 
 cer_start_day=`echo | openssl s_client -servername $url -connect ${url}:443 2>/dev/null | openssl x509 -noout -dates|grep notBefore| grep -v grep| awk -F'=' '{print $2}'| xargs -I {} date -d "{}" +%F`
