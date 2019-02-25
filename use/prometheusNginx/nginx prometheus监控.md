@@ -20,11 +20,11 @@ prometheus-nginxlog-exporter 遍历基于tail方法
 1)每个HTTP请求方法和响应状态的已处理的请求数   
 tengine_http_response_count_total{method="GET",request_uri="/",serviceport="21880",status="200",upstream_addr="10.3.16.20:31880"} 932
 
-tengine_http_response_time_seconds_count{app="10.3.120.6",method="POST",request_uri="/op/creditcard_plus_card_auth",serviceport="28869",status="200",upstream_addr="10.3.16.30:30869"} 129
+tengine_http_response_time_seconds_count{app="10.3.120.6",method="POST",request_uri="/op/credit",serviceport="28869",status="200",upstream_addr="10.3.16.30:30869"} 129
 
 2)每个HTTP请求方法和状态处理HTTP请求所需的总时间   
 
-tengine_http_response_time_seconds_sum{app="10.3.120.6",method="POST",request_uri="/op/creditcard_plus_card_auth",serviceport="28869",status="200",upstream_addr="10.3.16.30:30869"} 15.704000000000011
+tengine_http_response_time_seconds_sum{app="10.3.120.6",method="POST",request_uri="/op/credit",serviceport="28869",status="200",upstream_addr="10.3.16.30:30869"} 15.704000000000011
 
 
 * 第一个指标和第二个指标一起，可用于计算平均响应时间
