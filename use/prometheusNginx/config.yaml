@@ -1,0 +1,21 @@
+listen:
+  port: 4040
+  address: "0.0.0.0"
+
+enable_experimental: true
+
+namespaces:
+  - name: "tengine"
+    format: "[$time_local] $remote_addr $server_addr:$server_port $upstream_addr \"$request\" [$request_length/$bytes_sent] \"$status\"  {$request_time/$upstream_response_time} \"$http_referer\" \"$host\" \"$http_user_agent\" $http_x_forwarded_for"
+    source_files:
+      - /usr/local/tengine/logs/access.log
+    labels:
+      app: 10.0.120.16
+    relabel_configs:
+    - target_label: serviceport
+      from: server_port
+    - target_label: upstream_addr
+      from: upstream_addr
+    - target_label: request_uri
+      from: request
+      split: 2
