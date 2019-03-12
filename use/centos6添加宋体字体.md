@@ -13,4 +13,8 @@ yum install -y mkfontscale fontconfig
 mkfontscale 
 mkfontdir 
 fc-cache -fv 
+
+# 查看已安装的字体
+fc-list :lang=zh
+
 ```
