@@ -433,18 +433,52 @@ ETCD_PEER_AUTO_TLS="true"
 yum install etcd -yum
 
 vim /etc/etcd/etcd.conf
-ETCD_DATA_DIR="/var/lib/etcd/default.etcd"  #etcd数据保存目录
-ETCD_LISTEN_CLIENT_URLS="http://10.25.72.164:2379,http://localhost:2379"  #供外部客户端使用的url
-ETCD_ADVERTISE_CLIENT_URLS="http://10.25.72.164:2379,http://localhost:2379" #广播给外部客户端使用的url
-ETCD_NAME="etcd1"   #etcd实例名称
+#[member]
+#etcd实例名称
+ETCD_NAME=etcd1
+#etcd数据保存目录
+ETCD_DATA_DIR="/data/etcddata/default.etcd"
+#供外部客户端使用的url
+ETCD_LISTEN_CLIENT_URLS="http://10.3.17.8:2379,http://127.0.0.1:2379"
+#广播给外部客户端使用的url
+ETCD_ADVERTISE_CLIENT_URLS="http://10.3.17.8:2379,http://127.0.0.1:2379"
 
-ETCD_LISTEN_PEER_URLS="http://10.25.72.164:2380"  #集群内部通信使用的URL
-ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.25.72.164:2380"  #广播给集群内其他成员访问的URL
-ETCD_INITIAL_CLUSTER="etcd1=http://10.25.72.164:2380,etcd2=http://10.25.72.233:2380,etcd3=http://10.25.73.196:2380"    #初始集群成员列表
-ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster" #集群的名称
-ETCD_INITIAL_CLUSTER_STATE="new"  #初始集群状态，new为新建集群
+#[cluster]
+#集群内部通信使用的URL
+ETCD_LISTEN_PEER_URLS="http://10.3.17.8:2380"
+#广播给集群内其他成员访问的URL
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.3.17.8:2380"
+#初始集群成员列表
+ETCD_INITIAL_CLUSTER="etcd1=http://10.3.17.8:2380,etcd2=http://10.3.17.9:2380,etcd3=http://10.3.17.10:2380"
+#初始集群状态，new为新建集群
+ETCD_INITIAL_CLUSTER_STATE="new"
+#集群的名称
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-conf"
 
+#############################################################
 # 另外的两台 ETCD_INITIAL_CLUSTER_STATE="exist" 
+#[member]
+#etcd实例名称
+ETCD_NAME=etcd3
+#etcd数据保存目录
+ETCD_DATA_DIR="/data/etcddata/default.etcd"
+#供外部客户端使用的url
+ETCD_LISTEN_CLIENT_URLS="http://10.3.17.10:2379,http://127.0.0.1:2379"
+#广播给外部客户端使用的url
+ETCD_ADVERTISE_CLIENT_URLS="http://10.3.17.10:2379,http://127.0.0.1:2379"
+
+#[cluster]
+#集群内部通信使用的URL
+ETCD_LISTEN_PEER_URLS="http://10.3.17.10:2380"
+#广播给集群内其他成员访问的URL
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.3.17.10:2380"
+#初始集群成员列表
+ETCD_INITIAL_CLUSTER="etcd1=http://10.3.17.8:2380,etcd2=http://10.3.17.9:2380,etcd3=http://10.3.17.10:2380"
+#初始集群状态，new为新建集群
+ETCD_INITIAL_CLUSTER_STATE="exist"
+#集群的名称
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-conf"
+
 ```
 
 
