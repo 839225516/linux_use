@@ -129,10 +129,11 @@ tcp_wrappers=YES
 
 
 假设有ftp1, ftp2两个ftp用户, 计划让ftp1用户锁定在主目录下，不允许切换到其他目录, 但是允许ftp2用户自由切换目录，则可以分如下两种方式实现：
-chroot_local_user=YES
-chroot_list_enable=YES
-/etc/vsftpd/chroot_list名单列表为:
-ftp2
+
+	chroot_local_user=YES
+	chroot_list_enable=YES
+	/etc/vsftpd/chroot_list名单列表为:
+	ftp2
 
 
 #### 3.添加用户
